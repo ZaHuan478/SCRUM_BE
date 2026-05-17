@@ -10,10 +10,26 @@ const includeUser = {
   attributes: userAttributes,
 };
 
+const includePatientProfile = {
+  model: Patient,
+  as: 'patient',
+  required: false,
+};
+
 const create = (data) => Patient.create(data);
 
 const findAll = ({ offset, limit }) => Patient.findAndCountAll({
   include: [includeUser],
+  offset,
+  limit,
+  order: [['created_at', 'DESC']],
+});
+
+const findAllPatientUsers = ({ offset, limit }) => User.findAndCountAll({
+  where: { role: 'PATIENT' },
+  attributes: userAttributes,
+  include: [includePatientProfile],
+  distinct: true,
   offset,
   limit,
   order: [['created_at', 'DESC']],
@@ -47,6 +63,7 @@ const softDeleteById = async (id) => {
 module.exports = {
   create,
   findAll,
+  findAllPatientUsers,
   findById,
   findByUserId,
   updateById,

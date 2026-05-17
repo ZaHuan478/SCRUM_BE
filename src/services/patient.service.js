@@ -15,6 +15,24 @@ const validateGender = (gender) => {
   }
 };
 
+const toPlain = (record) => (typeof record?.toJSON === 'function' ? record.toJSON() : record);
+
+const mapPatientUser = (userRecord) => {
+  const user = toPlain(userRecord);
+  const patientProfile = user.patient || {};
+  const { patient, ...safeUser } = user;
+
+  return {
+    id: patientProfile.id || `user-${user.id}`,
+    user_id: user.id,
+    date_of_birth: patientProfile.date_of_birth || user.date_of_birth || null,
+    gender: patientProfile.gender || null,
+    address: patientProfile.address || null,
+    insurance_number: patientProfile.insurance_number || null,
+    user: safeUser,
+  };
+};
+
 const createPatient = async (data) => {
   const user = await User.findByPk(data.user_id);
   if (!user) {
@@ -48,10 +66,10 @@ const getPatients = async ({ page = 1, limit = 10 }) => {
   const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 100);
   const offset = (safePage - 1) * safeLimit;
 
-  const result = await patientRepository.findAll({ offset, limit: safeLimit });
+  const result = await patientRepository.findAllPatientUsers({ offset, limit: safeLimit });
 
   return {
-    patients: result.rows,
+    patients: result.rows.map(mapPatientUser),
     pagination: {
       page: safePage,
       limit: safeLimit,

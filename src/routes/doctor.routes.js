@@ -4,6 +4,7 @@ const {
   validateCreateDoctor,
   validateUpdateDoctor,
   validateChangeDoctorStatus,
+  validateUploadDoctorImage,
   validateGetDoctors,
   validateIdParam,
 } = require('../validations/doctor.validation');
@@ -15,6 +16,7 @@ router.get('/', validateGetDoctors, doctorController.getDoctors);
 router.get('/user/:user_id', validateIdParam('user_id'), doctorController.getDoctorByUserId);
 router.get('/:id', validateIdParam('id'), doctorController.getDoctorById);
 router.put('/:id', validateIdParam('id'), validateUpdateDoctor, doctorController.updateDoctor);
+router.post('/:id/image', validateIdParam('id'), validateUploadDoctorImage, doctorController.uploadDoctorImage);
 router.delete('/:id', validateIdParam('id'), doctorController.softDeleteDoctor);
 router.patch(
   '/:id/status',

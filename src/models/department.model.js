@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Hospital = sequelize.define(
-  'Hospital',
+const Department = sequelize.define(
+  'Department',
   {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
@@ -12,25 +12,10 @@ const Hospital = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    phone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: true,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
     },
-    city: {
-      type: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     status: {
@@ -40,14 +25,19 @@ const Hospital = sequelize.define(
     },
   },
   {
-    tableName: 'hospitals',
+    tableName: 'departments',
     timestamps: true,
     paranoid: true,
     underscored: true,
     deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    indexes: [
+      {
+        fields: ['name'],
+      },
+    ],
   }
 );
 
-module.exports = Hospital;
+module.exports = Department;

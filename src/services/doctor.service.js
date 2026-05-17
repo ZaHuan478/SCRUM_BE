@@ -1,4 +1,5 @@
 const { User } = require('../models');
+const cloudinaryService = require('./cloudinary.service');
 const doctorRepository = require('../repositories/doctor.repository');
 
 const VALID_STATUSES = ['ACTIVE', 'INACTIVE'];
@@ -25,6 +26,23 @@ const validateNumberFields = ({ experience_years, consultation_fee }) => {
   }
 };
 
+const normalizeText = (value) => {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+
+  const normalizedValue = String(value).trim();
+  return normalizedValue || null;
+};
+
+const validateUniqueCccd = async (cccd, doctorId) => {
+  if (!cccd) return;
+
+  const existingCccd = await doctorRepository.findByCccd(cccd);
+  if (existingCccd && String(existingCccd.id) !== String(doctorId || '')) {
+    throw createError('CCCD already exists', 409);
+  }
+};
+
 const createDoctor = async (data) => {
   const user = await User.findByPk(data.user_id);
   if (!user) {
@@ -47,12 +65,16 @@ const createDoctor = async (data) => {
 
   validateStatus(data.status);
   validateNumberFields(data);
+  const normalizedCccd = normalizeText(data.cccd);
+  await validateUniqueCccd(normalizedCccd);
 
   const doctor = await doctorRepository.create({
     user_id: data.user_id,
     license_number: data.license_number,
+    cccd: normalizedCccd,
     experience_years: data.experience_years,
     description: data.description,
+    image_url: normalizeText(data.image_url),
     consultation_fee: data.consultation_fee,
     status: data.status || 'ACTIVE',
   });
@@ -101,8 +123,10 @@ const getDoctorByUserId = async (userId) => {
 const updateDoctor = async (id, data) => {
   const allowedFields = [
     'license_number',
+    'cccd',
     'experience_years',
     'description',
+    'image_url',
     'consultation_fee',
     'status',
   ];
@@ -114,6 +138,15 @@ const updateDoctor = async (id, data) => {
 
   validateStatus(updateData.status);
   validateNumberFields(updateData);
+
+  if (updateData.cccd !== undefined) {
+    updateData.cccd = normalizeText(updateData.cccd);
+    await validateUniqueCccd(updateData.cccd, id);
+  }
+
+  if (updateData.image_url !== undefined) {
+    updateData.image_url = normalizeText(updateData.image_url);
+  }
 
   if (updateData.license_number) {
     const existingLicense = await doctorRepository.findByLicenseNumber(updateData.license_number);
@@ -128,6 +161,13 @@ const updateDoctor = async (id, data) => {
   }
 
   return doctor;
+};
+
+const updateDoctorImage = async (id, imageData) => {
+  await getDoctorById(id);
+
+  const imageUrl = await cloudinaryService.uploadImage(imageData, 'doctors');
+  return doctorRepository.updateById(id, { image_url: imageUrl });
 };
 
 const softDeleteDoctor = async (id) => {
@@ -156,6 +196,7 @@ module.exports = {
   getDoctorById,
   getDoctorByUserId,
   updateDoctor,
+  updateDoctorImage,
   softDeleteDoctor,
   changeDoctorStatus,
 };

@@ -29,6 +29,15 @@ const login = async (req, res) => {
   }
 };
 
+const createUser = async (req, res) => {
+  try {
+    const user = await userService.createUser(req.body);
+    return successResponse(res, 'User created successfully', user, 201);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await userService.getAllUsers();
@@ -47,6 +56,15 @@ const getUserById = async (req, res) => {
   }
 };
 
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await userService.getCurrentUser(req.user);
+    return successResponse(res, 'Current user retrieved successfully', user);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const user = await userService.updateUser(req.params.id, req.body, req.user);
@@ -56,10 +74,37 @@ const updateUser = async (req, res) => {
   }
 };
 
+const updateCurrentUser = async (req, res) => {
+  try {
+    const user = await userService.updateCurrentUser(req.body, req.user);
+    return successResponse(res, 'Profile updated successfully', user);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+const uploadCurrentUserAvatar = async (req, res) => {
+  try {
+    const user = await userService.uploadCurrentUserAvatar(req.body.image_data, req.user);
+    return successResponse(res, 'Avatar uploaded successfully', user);
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
 const softDeleteUser = async (req, res) => {
   try {
     await userService.softDeleteUser(req.params.id);
     return successResponse(res, 'Delete successfully');
+  } catch (error) {
+    return sendError(res, error);
+  }
+};
+
+const softDeleteCurrentUser = async (req, res) => {
+  try {
+    await userService.softDeleteCurrentUser(req.user);
+    return successResponse(res, 'Profile deleted successfully');
   } catch (error) {
     return sendError(res, error);
   }
@@ -77,9 +122,14 @@ const changeUserStatus = async (req, res) => {
 module.exports = {
   register,
   login,
+  createUser,
   getAllUsers,
   getUserById,
+  getCurrentUser,
   updateUser,
+  updateCurrentUser,
+  uploadCurrentUserAvatar,
   softDeleteUser,
+  softDeleteCurrentUser,
   changeUserStatus,
 };

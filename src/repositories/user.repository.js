@@ -8,6 +8,11 @@ const create = (data) => User.create(data);
 
 const findByEmail = (email, options = {}) => User.findOne({ where: { email }, ...options });
 
+const findByCccdNumber = (cccdNumber, options = {}) => User.findOne({
+  where: { cccd_number: cccdNumber },
+  ...options,
+});
+
 const findById = (id, options = {}) => User.findByPk(id, {
   attributes: defaultAttributes,
   ...options,
@@ -39,6 +44,7 @@ const changeStatus = async (id, status) => updateById(id, { status });
 module.exports = {
   create,
   findByEmail,
+  findByCccdNumber,
   findById,
   findAll,
   updateById,

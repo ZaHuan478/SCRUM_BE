@@ -29,6 +29,27 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    avatar_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    date_of_birth: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+    cccd_number: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
+    },
+    cccd_front_image: {
+      type: DataTypes.TEXT('long'),
+      allowNull: true,
+    },
+    cccd_back_image: {
+      type: DataTypes.TEXT('long'),
+      allowNull: true,
+    },
     role: {
       type: DataTypes.ENUM('PATIENT', 'DOCTOR', 'ADMIN'),
       allowNull: false,

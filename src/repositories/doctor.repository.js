@@ -38,6 +38,10 @@ const findByLicenseNumber = (licenseNumber) => Doctor.findOne({
   where: { license_number: licenseNumber },
 });
 
+const findByCccd = (cccd) => Doctor.findOne({
+  where: { cccd },
+});
+
 const updateById = async (id, data) => {
   const doctor = await Doctor.findByPk(id);
   if (!doctor) return null;
@@ -60,6 +64,7 @@ module.exports = {
   findById,
   findByUserId,
   findByLicenseNumber,
+  findByCccd,
   updateById,
   softDeleteById,
 };

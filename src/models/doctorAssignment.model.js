@@ -1,49 +1,36 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Doctor = sequelize.define(
-  'Doctor',
+const DoctorAssignment = sequelize.define(
+  'DoctorAssignment',
   {
     id: {
       type: DataTypes.BIGINT.UNSIGNED,
       primaryKey: true,
       autoIncrement: true,
     },
-    user_id: {
+    doctor_id: {
       type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      unique: true,
       references: {
-        model: 'users',
+        model: 'doctors',
         key: 'id',
       },
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT',
     },
-    license_number: {
-      type: DataTypes.STRING,
+    department_id: {
+      type: DataTypes.BIGINT.UNSIGNED,
       allowNull: false,
-      unique: true,
+      references: {
+        model: 'departments',
+        key: 'id',
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
     },
-    cccd: {
-      type: DataTypes.STRING(12),
-      allowNull: true,
-      unique: true,
-    },
-    experience_years: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    image_url: {
+    position: {
       type: DataTypes.STRING,
-      allowNull: true,
-    },
-    consultation_fee: {
-      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
     status: {
@@ -53,14 +40,28 @@ const Doctor = sequelize.define(
     },
   },
   {
-    tableName: 'doctors',
+    tableName: 'doctor_assignments',
     timestamps: true,
     paranoid: true,
     underscored: true,
     deletedAt: 'deleted_at',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    indexes: [
+      {
+        fields: ['doctor_id'],
+      },
+      {
+        fields: ['department_id'],
+      },
+      {
+        fields: ['status'],
+      },
+      {
+        fields: ['doctor_id', 'department_id'],
+      },
+    ],
   }
 );
 
-module.exports = Doctor;
+module.exports = DoctorAssignment;

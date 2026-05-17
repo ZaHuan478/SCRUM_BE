@@ -60,6 +60,15 @@ const updateDoctor = async (req, res) => {
   }
 };
 
+const uploadDoctorImage = async (req, res) => {
+  try {
+    const doctor = await doctorService.updateDoctorImage(req.params.id, req.body.image_data);
+    return successResponse(res, 'Doctor image uploaded successfully', doctor);
+  } catch (error) {
+    return errorResponse(res, error);
+  }
+};
+
 const softDeleteDoctor = async (req, res) => {
   try {
     await doctorService.softDeleteDoctor(req.params.id);
@@ -84,6 +93,7 @@ module.exports = {
   getDoctorById,
   getDoctorByUserId,
   updateDoctor,
+  uploadDoctorImage,
   softDeleteDoctor,
   changeDoctorStatus,
 };
